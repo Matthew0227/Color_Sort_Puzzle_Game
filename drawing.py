@@ -74,7 +74,7 @@ def draw_playing(screen, back_button, use_bg, bg_image):
     draw_background(screen, use_bg, bg_image)
     back_button.draw(screen)
 
-def draw_stars(x, y, num_stars):
+def draw_stars(screen, x, y, num_stars):
     """Draw star rating (1-3 stars)"""
     star_size = 30
     star_spacing = 60
@@ -92,7 +92,7 @@ def draw_stars(x, y, num_stars):
             color = (100, 100, 100)  # Gray
 
         # Draw star outline
-        draw_star_shape(color, star_x, star_y, star_size)
+        draw_star_shape(screen, color, star_x, star_y, star_size)
 
 def draw_star_shape(surf, color, x, y, size):
     """Draw a star shape"""
@@ -147,4 +147,3 @@ def draw_tubes(screen, tubes_num, tube_cols, color_choices, COLOR_RGB, animation
             pygame.draw.rect(screen, COLOR_RGB[color_choices[color_idx]], color_rect, 0, 3)
 
     return tube_boxes
-draw_stars

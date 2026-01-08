@@ -8,7 +8,8 @@ import timer
 from gameplay import check_move_validity, generate_start, check_victory, calculate_stars
 from assets import (
     color_choices,
-    COLOR_RGB
+    COLOR_RGB,
+    button_font
 )
 
 save_data = load_save()
@@ -380,6 +381,12 @@ while game_state["running"]:
                 get_tube_rect
             )
         draw_moving_tube()
+        timer_text = button_font.render(f'Time: {int(game_time)}s', True, 'yellow')
+        screen.blit(timer_text, (SCREEN_WIDTH - 300, 20))
+
+        # Draw stars (always visible) - update dynamically
+        current_stars = calculate_stars(game_time) if not win else stars
+        drawing.draw_stars(screen ,250, 60, current_stars)
 
     pygame.display.flip()
     timer.tick(fps)
