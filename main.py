@@ -15,6 +15,15 @@ from assets import (
 save_data = load_save()
 # Initialize pygame
 pygame.init()
+pygame.mixer.init()
+
+# Load background music
+try:
+    pygame.mixer.music.load("assets/Piano Sonata no. 14 in C#m 'Moonlight', Op. 27 no. 2 - III. Presto.mp3")
+    pygame.mixer.music.set_volume(0.5)
+    pygame.mixer.music.play(-1)
+except pygame.error:
+    pass
 
 # Screen dimensions
 SCREEN_WIDTH = 1280
@@ -50,10 +59,16 @@ menu_buttons = [
 
 back_button = Button(50, 40, 120, 50, "← Back", "back")
 
+# ---------------- OPTIONS BUTTONS ----------------
+sound_button = Button(200, 220, 200, 60, "Sound: ON", "toggle_sound")
+music_button = Button(200, 290, 200, 60, "Music: ON", "toggle_music")
+
 # ---------------- GAME STATE ----------------
 game_state = {
     "screen": "main_menu",
-    "running": True
+    "running": True,
+    "sound_enabled": True,
+    "music_enabled": True
 }
 # ---------------- GAME VARIABLES ----------------
 tube_colors = []
@@ -293,6 +308,22 @@ while game_state["running"]:
             action = back_button.click(event)
             if action == "back":
                 game_state["screen"] = "main_menu"
+            
+            # Handle option toggles
+            if game_state["screen"] == "options":
+                action = sound_button.click(event)
+                if action == "toggle_sound":
+                    game_state["sound_enabled"] = not game_state["sound_enabled"]
+                    sound_button.text = "Sound: ON" if game_state["sound_enabled"] else "Sound: OFF"
+                
+                action = music_button.click(event)
+                if action == "toggle_music":
+                    game_state["music_enabled"] = not game_state["music_enabled"]
+                    music_button.text = "Music: ON" if game_state["music_enabled"] else "Music: OFF"
+                    if game_state["music_enabled"]:
+                        pygame.mixer.music.unpause()
+                    else:
+                        pygame.mixer.music.pause()
 
         elif game_state["screen"] == "playing":
                 # ---- BACK BUTTON ----
@@ -321,7 +352,6 @@ while game_state["running"]:
                 if event.key == pygame.K_SPACE:
                     # Reset level
                     tube_colors = copy.deepcopy(initial_colors)
-                    game_time = 0
                     stars = 0
                     animation['state'] = AnimationState.IDLE
                     selected = False
@@ -343,6 +373,9 @@ while game_state["running"]:
             btn.update(mouse_pos)
     elif game_state["screen"] in ["options", "how_to_play"]:
         back_button.update(mouse_pos)
+        if game_state["screen"] == "options":
+            sound_button.update(mouse_pos)
+            music_button.update(mouse_pos)
     elif game_state["screen"] == "playing":
         back_button.update(mouse_pos)
         # Update animation
@@ -362,7 +395,7 @@ while game_state["running"]:
     if game_state["screen"] == "main_menu":
         drawing.draw_main_menu(screen, menu_buttons, save_data, use_background_image, background_image)
     elif game_state["screen"] == "options":
-        drawing.draw_options(screen, back_button, use_background_image, background_image)
+        drawing.draw_options(screen, back_button, sound_button, music_button, use_background_image, background_image)
     elif game_state["screen"] == "how_to_play":
         drawing.draw_how_to_play(screen, back_button, use_background_image, background_image)
     elif game_state["screen"] == "playing":
