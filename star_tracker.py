@@ -3,10 +3,8 @@ import json
 import os
 
 class StarTracker:
-    """Track star achievements using list-based data structures"""
     
     def __init__(self, filename="star_data.json"):
-        """Initialize star tracker with empty stacks for each level"""
         self.filename = filename
         self.total_levels = 10
         self.star_stacks = []
@@ -18,7 +16,6 @@ class StarTracker:
         self.load_data()
     
     def push_star_achievement(self, level, stars, time):
-        """Push a new star achievement onto the level's stack (Stack - FILO)"""
         if 1 <= level <= self.total_levels:
             achievement = {
                 'stars': stars,
@@ -33,21 +30,18 @@ class StarTracker:
         return False
     
     def pop_star_achievement(self, level):
-        """Pop the most recent achievement from level's stack (Stack - FILO)"""
         if 1 <= level <= self.total_levels:
             if self.star_stacks[level-1]:
                 return self.star_stacks[level-1].pop()  # FILO
         return None
     
     def peek_star_achievement(self, level):
-        """Peek at the top achievement without removing it (Stack - FILO)"""
         if 1 <= level <= self.total_levels:
             if self.star_stacks[level-1]:
                 return self.star_stacks[level-1][-1]  # Last element
         return None
     
     def get_best_stars(self, level):
-        """Get the best star rating for a level by iterating through stack"""
         if 1 <= level <= self.total_levels:
             best_stars = 0
             best_time = 0  # Change from float('inf') to 0
@@ -67,7 +61,6 @@ class StarTracker:
         return 0, 0
     
     def get_level_stats(self, level):
-        """Get comprehensive stats for a level using list operations"""
         if 1 <= level <= self.total_levels:
             stack = self.star_stacks[level-1]
             if not stack:
@@ -95,7 +88,6 @@ class StarTracker:
         return None
     
     def enqueue_recent_achievement(self, level, stars, time):
-        """Add achievement to recent queue (Queue - FIFO)"""
         achievement = {
             'level': level,
             'stars': stars,
@@ -107,17 +99,14 @@ class StarTracker:
             self.recent_achievements.pop(0)
     
     def dequeue_recent_achievement(self):
-        """Remove and return oldest achievement from recent queue (FIFO)"""
         if self.recent_achievements:
             return self.recent_achievements.pop(0)  # FIFO
         return None
     
     def get_recent_achievements(self):
-        """Get all recent achievements (Queue - FIFO order)"""
         return self.recent_achievements.copy()
     
     def get_level_completion_status(self):
-        """Get completion status for all levels using list operations"""
         status = []
         for level in range(1, self.total_levels + 1):
             best_stars, best_time = self.get_best_stars(level)
@@ -130,7 +119,6 @@ class StarTracker:
         return status
     
     def get_total_stars(self):
-        """Get total stars earned across all levels"""
         total = 0
         for level in range(1, self.total_levels + 1):
             best_stars, _ = self.get_best_stars(level)
@@ -138,10 +126,6 @@ class StarTracker:
         return total
     
     def unlock_next_level(self, completed_level):
-        """
-        Use Queue (FIFO) to unlock levels sequentially.
-        When a level is completed, unlock the next level in the queue.
-        """
         if 1 <= completed_level < self.total_levels:
             next_level = completed_level + 1
             if next_level not in self.level_unlock_queue:
@@ -151,10 +135,6 @@ class StarTracker:
         return None
     
     def get_unlocked_levels(self):
-        """
-        Get list of unlocked levels using the queue.
-        Level 1 always unlocked, rest unlock via completion queue.
-        """
         unlocked = [1]  # Level 1 always available
         completion_status = self.get_level_completion_status()
         for status in completion_status:
@@ -167,12 +147,10 @@ class StarTracker:
         return sorted(unlocked)
     
     def is_level_unlocked(self, level):
-        """Check if a level is unlocked using the queue system"""
         unlocked_levels = self.get_unlocked_levels()
         return level in unlocked_levels
     
     def get_next_locked_level(self):
-        """Get the next level that's locked (for UI hints)"""
         unlocked_levels = self.get_unlocked_levels()
         for level in range(1, self.total_levels + 1):
             if level not in unlocked_levels:
@@ -180,7 +158,6 @@ class StarTracker:
         return None
     
     def clear_level_data(self, level):
-        """Clear all achievements for a specific level"""
         if 1 <= level <= self.total_levels:
             self.star_stacks[level-1].clear()
             self.save_data()
@@ -188,7 +165,6 @@ class StarTracker:
         return False
     
     def clear_all_data(self):
-        """Clear all star tracking data"""
         for i in range(self.total_levels):
             self.star_stacks[i].clear()
         self.recent_achievements.clear()
@@ -196,11 +172,9 @@ class StarTracker:
         self.save_data()
     
     def reset_all_levels(self):
-        """Reset all levels - clear all achievements and unlock queue"""
         self.clear_all_data()
     
     def save_data(self):
-        """Save star data to JSON file"""
         try:
             serializable_stacks = []
             for stack in self.star_stacks:
@@ -220,7 +194,6 @@ class StarTracker:
             return False
     
     def load_data(self):
-        """Load star data from JSON file"""
         try:
             if os.path.exists(self.filename):
                 with open(self.filename, 'r') as f:
@@ -240,12 +213,10 @@ class StarTracker:
         return False
     
     def get_current_time(self):
-        """Get current timestamp (simplified for this game)"""
         import time
         return time.time()
     
     def display_stats(self):
-        """Display all statistics (for debugging/console)"""
         print("\n=== STAR TRACKER STATISTICS ===")
         print(f"Total Stars Earned: {self.get_total_stars()}")
         print(f"Total Levels: {self.total_levels}")

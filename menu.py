@@ -6,6 +6,14 @@ import star_tracker
 pygame.init()
 pygame.mixer.init()
 
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -27,7 +35,7 @@ STAR_FILLED = (255, 215, 0)
 LEVEL_TITLE_COLOR = (255, 255, 255)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-ASSETS_DIR = os.path.join(BASE_DIR, 'assets')
+ASSETS_DIR = resource_path("assets")
 
 background_image_main = None
 background_image_level_select = None
