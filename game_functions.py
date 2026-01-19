@@ -5,11 +5,7 @@ import sys
 import math
 import levels
 import star_tracker
-
-# Initialize pygame
 pygame.init()
-
-# Initialize game variables
 WIDTH = 1280
 HEIGHT = 720
 screen = pygame.display.set_mode([WIDTH, HEIGHT])
@@ -20,8 +16,6 @@ fps = 60
 timer = pygame.time.Clock()
 color_choices = ['red', 'orange', 'light blue', 'dark blue', 'dark green', 'pink', 'purple', 'dark gray',
                  'brown', 'light green', 'yellow', 'white']
-
-# Color definitions for pygame
 COLOR_RGB = {
     'red': (255, 0, 0),
     'orange': (255, 165, 0),
@@ -36,15 +30,11 @@ COLOR_RGB = {
     'yellow': (255, 255, 0),
     'white': (255, 255, 255)
 }
-
-# Animation states
 class AnimationState:
     IDLE = 0
     MOVE = 1
     POUR = 2
     RETURN = 3
-
-# Game variables (will be initialized per game)
 tube_colors = []
 initial_colors = []
 tubes = 0
@@ -57,8 +47,6 @@ win = False
 game_time = 0
 stars = 0
 current_star_times = [60, 120, 180]
-
-# Animation variables
 animation = {
     'state': AnimationState.IDLE,
     'source': -1,
@@ -73,8 +61,6 @@ animation = {
     'current_y': 0,
     'angle': 0
 }
-
-# Initialize star tracker
 star_tracker_instance = star_tracker.StarTracker()
 
 def draw_stars(x, y, num_stars):
@@ -193,8 +179,6 @@ def get_tube_rect(tubes_num, index):
         
 def get_centered_tube_rect(tubes_num, index):
     """Smart tube positioning that works for both game and tutorial"""
-    # For tutorial (small number of tubes), use centered layout
-    # For regular game (many tubes), use the original layout
     if tubes_num <= 6:  # Tutorial typically has fewer tubes
         tube_width = 65
         tube_spacing = 80
@@ -206,7 +190,6 @@ def get_centered_tube_rect(tubes_num, index):
         
         return pygame.Rect(x, y, tube_width, 200)
     else:
-        # Use original layout for regular game
         if tubes_num % 2 == 0:
             tubes_per_row = tubes_num // 2
             offset = False
@@ -282,7 +265,6 @@ def draw_moving_tube():
     progress = animation['progress']
 
     if animation['state'] == AnimationState.MOVE:
-        # Move to position above destination tube
         target_x = dest_rect.x
         target_y = dest_rect.y - 100
 
@@ -290,7 +272,6 @@ def draw_moving_tube():
         y = source_rect.y + (target_y - source_rect.y) * progress
         angle = 0
     elif animation['state'] == AnimationState.POUR:
-        # Stay above destination and pour
         target_x = dest_rect.x
         target_y = dest_rect.y - 100
 
@@ -298,7 +279,6 @@ def draw_moving_tube():
         y = target_y
         angle = 90 * progress
     elif animation['state'] == AnimationState.RETURN:
-        # Return to original position
         target_x = dest_rect.x
         target_y = dest_rect.y - 100
 
@@ -437,8 +417,6 @@ def check_victory(colors):
                     if colors[i][j] != main_color:
                         won = False
     return won
-
-# Main game function (called from main.py)
 def run_game(level_num):
     global tube_colors, initial_colors, tubes, new_game, selected, tube_rects, select_rect, win, game_time, stars, current_star_times, animation
     
@@ -446,8 +424,6 @@ def run_game(level_num):
         tracker = star_tracker_instance  # Use existing global
     except:
         tracker = star_tracker.StarTracker()
-
-    # Reset game state
     current_level = level_num
     new_game = True
     selected = False
@@ -520,7 +496,6 @@ def run_game(level_num):
                     selected = False
                     select_rect = 100
                 elif event.key == pygame.K_ESCAPE:
-                    # Return to menu
                     return stars
                 elif event.key == pygame.K_s:
                     star_tracker_instance.display_stats()
@@ -606,8 +581,6 @@ def run_how_to_play_screen():
         'current_y': 0,
         'angle': 0
     }
-
-    # Initialize the tutorial game
     tubes, tube_colors = tut_generate_start(tutorial_level)
     initial_colors = copy.deepcopy(tube_colors)
 
@@ -617,8 +590,6 @@ def run_how_to_play_screen():
 
         if animation['state'] != AnimationState.IDLE:
             update_animation()
-
-        # Use the improved draw functions (they automatically center for tutorial)
         tube_rects = draw_tubes(tubes, tube_colors)
         draw_moving_tube()
 
@@ -675,12 +646,8 @@ def run_how_to_play_screen():
                             select_rect = 100
                             if instruction_state == "select_second":
                                 instruction_state = "completed_move"  # Player completed a move
-
-        # ESC instruction at the top
         esc_text = small_font.render('Press ESC to return to menu', True, (200, 200, 200))
         screen.blit(esc_text, (WIDTH - esc_text.get_width() - 20, 20))
-
-        # Display tutorial instructions based on level and state
         if tutorial_level == 1 and not win:
             if instruction_state == "select_first":
                 instruction_text = font.render('Press the container to select it', True, (0, 255, 255))
@@ -696,8 +663,6 @@ def run_how_to_play_screen():
         elif tutorial_level == 3 and not win:
             instruction_text = font.render('Fill containers with 4 same colors to win!', True, (0, 255, 255))
             screen.blit(instruction_text, (WIDTH//2 - instruction_text.get_width()//2, HEIGHT - 100))
-
-        # Display completion message
         if tutorial_complete:
             complete_text = font.render('Tutorial Completed! Press ESC to return to menu!', True, 'white')
             box_width = complete_text.get_width() + 80
@@ -716,8 +681,6 @@ def run_how_to_play_screen():
             pygame.draw.rect(screen, (30, 30, 70), (box_x, box_y, box_width, box_height))
             pygame.draw.rect(screen, (0, 200, 255), (box_x, box_y, box_width, box_height), 4)
             screen.blit(victory_text, (WIDTH//2 - victory_text.get_width()//2, box_y + 30))
-
-        # Restart instruction at bottom
         restart_text = small_font.render('Press SPACE to restart', True, (200, 200, 200))
         screen.blit(restart_text, (WIDTH//2 - restart_text.get_width()//2, HEIGHT - 40))
 

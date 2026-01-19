@@ -34,7 +34,7 @@ def unlock_next_level(self, completed_level):
     if 1 <= completed_level < self.total_levels:
         next_level = completed_level + 1
         if next_level not in self.level_unlock_queue:
-            self.level_unlock_queue.append(next_level)  # Enqueue
+            self.level_unlock_queue.append(next_level)
             self.save_data()
             return next_level
     return None
@@ -49,15 +49,13 @@ def get_unlocked_levels(self):
     Get list of unlocked levels using the queue.
     Level 1 always unlocked, rest unlock via completion queue.
     """
-    unlocked = [1]  # Level 1 always available
+    unlocked = [1]
     
-    # Add all levels that have been completed
     completion_status = self.get_level_completion_status()
     for status in completion_status:
         if status['completed'] and status['level'] not in unlocked:
             unlocked.append(status['level'])
     
-    # Add queued levels
     for level in self.level_unlock_queue:
         if level not in unlocked:
             unlocked.append(level)
@@ -100,11 +98,9 @@ def get_next_locked_level(self):
 ### Updated `create_level_buttons()`
 ```python
 def create_level_buttons():
-    # ... setup code ...
     unlocked_levels = tracker.get_unlocked_levels()
     
     for i in range(10):
-        # ... positioning code ...
         level_num = i + 1
         is_locked = level_num not in unlocked_levels
         level_buttons.append(LevelButton(x, y, level_size, level_num, 
@@ -124,9 +120,8 @@ def update_level_stars(level_num, stars_earned):
     if 1 <= level_num <= 10:
         if stars_earned > level_stars[level_num - 1]:
             level_stars[level_num - 1] = stars_earned
-            # Unlock next level when current level is completed
             tracker.unlock_next_level(level_num)
-            create_level_buttons()  # Recreate with updated locks
+            create_level_buttons()
             return True
     return False
 ```
@@ -139,7 +134,7 @@ The `level_unlock_queue` is saved to `star_data.json`:
 {
   "star_stacks": [...],
   "recent_achievements": [...],
-  "level_unlock_queue": [2, 3, 4, 5]  // Levels unlocked so far
+  "level_unlock_queue": [2, 3, 4, 5]
 }
 ```
 

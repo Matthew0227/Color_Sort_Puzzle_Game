@@ -3,17 +3,14 @@ import sys
 import os
 import star_tracker
 
-# Initialize pygame and mixer
 pygame.init()
 pygame.mixer.init()
 
-# Screen dimensions
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Color Sort Puzzle")
 
-# Colors (same as before)
 BACKGROUND = (25, 25, 40)
 TITLE_COLOR = (70, 200, 255)
 BUTTON_COLOR = (50, 120, 180)
@@ -29,17 +26,14 @@ STAR_EMPTY = (100, 100, 120)
 STAR_FILLED = (255, 215, 0) 
 LEVEL_TITLE_COLOR = (255, 255, 255)
 
-# Get the directory where this script is located
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ASSETS_DIR = os.path.join(BASE_DIR, 'assets')
 
-# Background images
 background_image_main = None
 background_image_level_select = None
 use_background_image_main = False
 use_background_image_level_select = False
 
-# Try to load main background image
 possible_paths_main = [
     os.path.join(ASSETS_DIR, "background.jpg"),
     os.path.join(ASSETS_DIR, "menu_background.jpg"),
@@ -57,7 +51,6 @@ for path in possible_paths_main:
     except (pygame.error, FileNotFoundError):
         continue
 
-# Try to load level select background image
 possible_paths_level = [
     os.path.join(ASSETS_DIR, "background_level_select.jpg"),
     os.path.join(ASSETS_DIR, "level_select_background.jpg"),
@@ -75,15 +68,12 @@ for path in possible_paths_level:
     except (pygame.error, FileNotFoundError):
         continue
 
-# If level select background not found, use main background
 if not use_background_image_level_select and use_background_image_main:
     background_image_level_select = background_image_main
     use_background_image_level_select = True
 
-# Load music
 music_volume = 0.5
 
-# Initialize Star Tracker for level unlock queue system
 tracker = star_tracker.StarTracker()
 
 try:
@@ -100,14 +90,12 @@ except:
     except:
         pass
 
-# Fonts
 title_font = pygame.font.SysFont("arial", 76, bold=True)
 button_font = pygame.font.SysFont("arial", 36)
 info_font = pygame.font.SysFont("arial", 24)
 slider_font = pygame.font.SysFont("arial", 28)
 level_font = pygame.font.SysFont("arial", 32, bold=True)
 
-# Button class
 class Button:
     def __init__(self, x, y, width, height, text, action=None, data=None):
         self.rect = pygame.Rect(x, y, width, height)
@@ -134,7 +122,6 @@ class Button:
                 return self.action, self.data
         return None, None
 
-# Level Button class
 class LevelButton:
     def __init__(self, x, y, size, level_num, stars=0, is_locked=False):
         self.rect = pygame.Rect(x, y, size, size)
@@ -143,17 +130,16 @@ class LevelButton:
         self.hovered = False
         self.is_locked = is_locked
         
-    def draw(self, surface):
-        # Change color based on locked state
+    def draw(self, surface):     
         if self.is_locked:
-            color = (40, 40, 60)  # Darker color for locked
+            color = (40, 40, 60)  
         else:
             color = LEVEL_HOVER if self.hovered else LEVEL_COLOR
         
         pygame.draw.rect(surface, color, self.rect, border_radius=15)
         pygame.draw.rect(surface, SHADOW_COLOR, self.rect, 4, border_radius=15)
         run_level_select_screen
-        # Show level number and stars for both locked and unlocked levels
+
         level_text = level_font.render(str(self.level_num), True, BUTTON_TEXT)
         text_rect = level_text.get_rect(center=(self.rect.centerx, self.rect.centery - 15))
         surface.blit(level_text, text_rect)
@@ -197,7 +183,6 @@ class LevelButton:
                 return "play_level", self.level_num
         return None, None
 
-# Slider class
 class Slider:
     def __init__(self, x, y, width, height):
         self.rect = pygame.Rect(x, y, width, height)
@@ -228,11 +213,9 @@ class Slider:
                 music_volume = max(0.0, min(1.0, music_volume))
                 pygame.mixer.music.set_volume(music_volume)
 
-# Initialize level progress
 level_stars = [0] * 10
 level_buttons = []
 
-# Load saved star data from tracker
 def load_level_stars():
     global level_stars
     level_stars = [0] * 10
@@ -242,7 +225,6 @@ def load_level_stars():
 
 load_level_stars()
 
-# Create level buttons
 def create_level_buttons():
     global level_buttons
     level_buttons = []
@@ -264,7 +246,6 @@ def create_level_buttons():
 
 create_level_buttons()
 
-# Draw background function
 def draw_background(screen_type="main_menu"):
     if screen_type == "level_select":
         if use_background_image_level_select:
@@ -283,20 +264,18 @@ def draw_background(screen_type="main_menu"):
         else:
             screen.fill(BACKGROUND)
 
-# Update level stars
 def update_level_stars(level_num, stars_earned):
     if 1 <= level_num <= 10:
         if stars_earned > level_stars[level_num - 1]:
             level_stars[level_num - 1] = stars_earned
-            # Save stars to tracker so they persist after restart
+            
             tracker.push_star_achievement(level_num, stars_earned, 0)
-            # Unlock next level when current level is completed
+            
             tracker.unlock_next_level(level_num)
-            create_level_buttons()  # Recreate buttons with updated stars and locks
+            create_level_buttons()  
             return True
     return False
 
-# Screen functions
 def run_menu_screen():
     buttons = [
         Button(190, 250, 300, 60, "Start Game", "level_select"),
@@ -356,14 +335,12 @@ def run_level_select_screen():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 return "back", 0
             
-            # Back button
             back_button = Button(50, 40, 120, 50, "← Back", "back")
             back_button.check_hover(mouse_pos)
             action, data = back_button.handle_event(event)
             if action == "back":
                 return "back", 0
             
-            # Level buttons
             for level_button in level_buttons:
                 level_button.check_hover(mouse_pos)
                 action, level_num = level_button.handle_event(event)
@@ -384,11 +361,10 @@ def run_level_select_screen():
         
         for level_button in level_buttons:
             level_button.draw(screen)
-        
-        # Simplified version - card positioned right below level grid
+                
         next_locked = tracker.get_next_locked_level()
         if next_locked:
-            # Card dimensions
+            
             card_width, card_height = 500, 80
             
             max_bottom = 0
@@ -396,36 +372,29 @@ def run_level_select_screen():
                 if btn.rect.bottom > max_bottom:
                     max_bottom = btn.rect.bottom
             
-            card_y = max_bottom + 20  # 20 pixels below the lowest level button
+            card_y = max_bottom + 20  
             card_x = SCREEN_WIDTH // 2 - card_width // 2
-            
-            # Ensure card doesn't go off screen
+                        
             if card_y + card_height > SCREEN_HEIGHT - 50:
                 card_y = SCREEN_HEIGHT - 50 - card_height
-            
-            # Draw the card (use same drawing code as above)
-            # Card with shadow
+                       
             shadow_offset = 3
             pygame.draw.rect(screen, (25, 20, 15), 
                             (card_x + shadow_offset, card_y + shadow_offset, card_width, card_height),
                             border_radius=10)
-            
-            # Card background
+                       
             pygame.draw.rect(screen, (45, 35, 25), 
                             (card_x, card_y, card_width, card_height),
                             border_radius=10)
-            
-            # Card border
+                     
             pygame.draw.rect(screen, (120, 90, 60), 
                             (card_x, card_y, card_width, card_height),
                             width=2, border_radius=10)
-            
-            # Icon and text (more compact)
+                       
             icon_font = pygame.font.SysFont("Segoe UI Emoji", 28)
             lock_icon = icon_font.render("🔒", True, (255, 200, 100))
             screen.blit(lock_icon, (card_x + 15, card_y + card_height // 2 - lock_icon.get_height() // 2))
-            
-            # Combined text
+                       
             hint_text = info_font.render(f"Level {next_locked} locked • Complete Level {next_locked - 1} to unlock", 
                                         True, (255, 220, 180))
             screen.blit(hint_text, (card_x + 55, card_y + card_height // 2 - hint_text.get_height() // 2))

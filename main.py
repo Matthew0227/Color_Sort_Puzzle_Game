@@ -4,18 +4,14 @@ import menu
 import game_functions as gf
 
 def main():
-    # Initialize pygame
     pygame.init()
     
-    # Start with menu
     current_screen = "main_menu"
     current_level = 1
-    
-    # Main application loop
+      
     running = True
     while running:
-        if current_screen == "main_menu":
-            # Run menu screen
+        if current_screen == "main_menu":            
             result = menu.run_menu_screen()
             if result == "quit":
                 running = False
@@ -26,8 +22,7 @@ def main():
             elif result == "how_to_play":
                 current_screen = "how_to_play"
         
-        elif current_screen == "level_select":
-            # Run level select screen
+        elif current_screen == "level_select":      
             result, level_num = menu.run_level_select_screen()
             if result == "back":
                 current_screen = "main_menu"
@@ -35,25 +30,20 @@ def main():
                 current_level = level_num
                 current_screen = "game"
         
-        elif current_screen == "game":
-            # Run the actual game
+        elif current_screen == "game":          
             stars_earned = gf.run_game(current_level)
-            
-            # Update level progress with stars earned
+                  
             if stars_earned > 0:
                 menu.update_level_stars(current_level, stars_earned)
-            
-            # Return to level select
+                  
             current_screen = "level_select"
             
-        elif current_screen == "options":
-            # Run options screen
+        elif current_screen == "options":           
             result = menu.run_options_screen()
             if result == "back":
                 current_screen = "main_menu"
                 
-        elif current_screen == "how_to_play":
-            # Run how to play screen
+        elif current_screen == "how_to_play":       
             result = gf.run_how_to_play_screen()
             if result:
                 current_screen = "main_menu"

@@ -1,6 +1,6 @@
 tutorial_levels = [
     {
-        "tubes": 2,  # Level 1
+        "tubes": 2,  
         "colors": 1,
         "layout": [
             [0, 0, 0],
@@ -8,7 +8,7 @@ tutorial_levels = [
         ]
     },
     {
-        "tubes": 3,  # Level 2
+        "tubes": 3,  
         "colors": 2,
         "layout": [
             [1, 1],
@@ -17,7 +17,7 @@ tutorial_levels = [
         ]
     },
     {
-        "tubes": 5,  # Level 2
+        "tubes": 5,  
         "colors": 3,
         "layout": [
             [2, 2, 2, 1],
@@ -31,23 +31,23 @@ tutorial_levels = [
 
 levels = [
     {
-        "tubes": 4,  # Level 1
+        "tubes": 4,  
         "colors": 2,
-        "star_times": [20, 40, 60],  # 3 stars: <20s, 2 stars: <40s, 1 star: <60s
+        "star_times": [20, 40, 60],  
         "layout": [
-            [0, 1, 1, 0],  # Tube 1
-            [0, 1, 0, 1],  # Tube 2
-            [],             # Empty
-            []              # Empty
+            [0, 1, 1, 0],  
+            [0, 1, 0, 1],  
+            [],             
+            []              
         ]
     },
     
     {
         "tubes": 5,
         "colors": 3,
-        "star_times": [30, 60, 90],  # Level 2 thresholds
+        "star_times": [30, 60, 90],  
         "layout": [
-            [0, 1, 2, 1],  # Level 2
+            [0, 1, 2, 1],  
             [1, 0, 1, 2],
             [2, 0, 0, 2],
             [],
@@ -58,9 +58,9 @@ levels = [
     {
         "tubes": 7,
         "colors": 5,
-        "star_times": [40, 80, 120],  # Level 3 thresholds
+        "star_times": [40, 80, 120],  
         "layout": [
-            [0, 1, 2, 3],  # Level 3
+            [0, 1, 2, 3],  
             [0, 1, 4, 3],
             [0, 2, 4, 1],
             [4, 3, 2, 1],
@@ -73,9 +73,9 @@ levels = [
     {
         "tubes": 7,
         "colors": 5,
-        "star_times": [50, 100, 150],  # Level 4 thresholds
+        "star_times": [50, 100, 150],  
         "layout": [
-            [0, 1, 2, 3],  # Level 4
+            [0, 1, 2, 3],  
             [4, 0, 1, 2],
             [3, 4, 0, 1],
             [2, 3, 4, 0],
@@ -88,9 +88,9 @@ levels = [
     {
         "tubes": 8,
         "colors": 6,
-        "star_times": [60, 120, 180],  # Level 5 thresholds
+        "star_times": [60, 120, 180],  
         "layout": [
-            [0, 1, 2, 3],  # Level 5
+            [0, 1, 2, 3],  
             [0, 1, 4, 5],
             [0, 2, 4, 5],
             [3, 1, 2, 5],
@@ -104,9 +104,9 @@ levels = [
     {
         "tubes": 8,
         "colors": 6,
-        "star_times": [70, 140, 210],  # Level 6 thresholds
+        "star_times": [70, 140, 210],  
         "layout": [
-            [0, 1, 2, 3],  # Level 6
+            [0, 1, 2, 3],  
             [4, 5, 0, 1],
             [2, 3, 4, 5],
             [5, 4, 3, 2],
@@ -120,9 +120,9 @@ levels = [
     {
         "tubes": 9,
         "colors": 7,
-        "star_times": [80, 160, 240],  # Level 7 thresholds
+        "star_times": [80, 160, 240],  
         "layout": [
-            [0, 1, 2, 3],  # Level 7
+            [0, 1, 2, 3],  
             [0, 1, 4, 5],
             [0, 2, 4, 6],
             [3, 1, 2, 6],
@@ -137,9 +137,9 @@ levels = [
     {
         "tubes": 9,
         "colors": 7,
-        "star_times": [90, 180, 270],  # Level 8 thresholds
+        "star_times": [90, 180, 270],  
         "layout": [
-            [0, 1, 2, 3],  # Level 8
+            [0, 1, 2, 3],  
             [4, 5, 6, 0],
             [1, 2, 3, 4],
             [5, 6, 0, 1],
@@ -156,9 +156,9 @@ levels = [
         "difficulty": 4,
         "tubes": 10,
         "colors": 8,
-        "star_times": [100, 200, 300],  # Level 9 thresholds
+        "star_times": [100, 200, 300],  
         "layout": [
-            [0, 1, 2, 3],  # Level 9
+            [0, 1, 2, 3],  
             [0, 1, 4, 5],
             [0, 2, 4, 6],
             [3, 1, 2, 6],
@@ -174,9 +174,9 @@ levels = [
     {
         "tubes": 10,
         "colors": 8,
-        "star_times": [120, 240, 360],  # Level 10 thresholds
+        "star_times": [120, 240, 360],  
         "layout": [
-            [0, 1, 2, 3],  # Level 10
+            [0, 1, 2, 3],  
             [4, 5, 6, 7],
             [7, 6, 5, 4],
             [3, 2, 1, 0],
@@ -190,20 +190,20 @@ levels = [
     }
 ]
 
-# Color index to name mapping (matches your color_choices list)
+
 COLOR_NAMES = [
-    'red',           # 0
-    'orange',        # 1
-    'light blue',    # 2
-    'dark blue',     # 3
-    'dark green',    # 4
-    'pink',          # 5
-    'purple',        # 6
-    'dark gray',     # 7
-    'brown',         # 8
-    'light green',   # 9
-    'yellow',        # 10
-    'white'          # 11
+    'red',           
+    'orange',        
+    'light blue',    
+    'dark blue',     
+    'dark green',    
+    'pink',          
+    'purple',        
+    'dark gray',     
+    'brown',         
+    'light green',   
+    'yellow',        
+    'white'          
 ]
 
 def get_level(level_num):
@@ -239,7 +239,7 @@ def get_level_star_times(level_num):
     level = get_level(level_num)
     if level and "star_times" in level:
         return level["star_times"]
-    return [60, 120, 180]  # Default if not specified
+    return [60, 120, 180]  
 
 def print_level_info(level_num):
     """Print level information (for debugging)"""

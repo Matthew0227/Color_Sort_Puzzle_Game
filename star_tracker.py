@@ -9,18 +9,9 @@ class StarTracker:
         """Initialize star tracker with empty stacks for each level"""
         self.filename = filename
         self.total_levels = 10
-        
-        # Main data structure: list of stacks (FILO) for star history
-        # Each level has a stack of star achievements
         self.star_stacks = []
-        
-        # Queue (FIFO) for recent achievements (last 5)
         self.recent_achievements = []
-        
-        # Queue (FIFO) for completed levels to control unlock order
         self.level_unlock_queue = []
-        
-        # Initialize with empty stacks
         for _ in range(self.total_levels):
             self.star_stacks.append([])  # Empty stack for each level
         
@@ -34,11 +25,7 @@ class StarTracker:
                 'time': time,
                 'timestamp': self.get_current_time()
             }
-            
-            # Push to stack (FILO)
             self.star_stacks[level-1].append(achievement)
-            
-            # Also add to recent achievements queue (FIFO)
             self.enqueue_recent_achievement(level, stars, time)
             
             self.save_data()
@@ -64,17 +51,11 @@ class StarTracker:
         if 1 <= level <= self.total_levels:
             best_stars = 0
             best_time = 0  # Change from float('inf') to 0
-            
-            # If stack is empty, return 0, 0
             if not self.star_stacks[level-1]:
                 return best_stars, best_time
-            
-            # Initialize with first achievement
             first_achievement = self.star_stacks[level-1][0]
             best_stars = first_achievement['stars']
             best_time = first_achievement['time']
-            
-            # Iterate through remaining achievements to find best
             for achievement in self.star_stacks[level-1][1:]:
                 if achievement['stars'] > best_stars:
                     best_stars = achievement['stars']
@@ -97,15 +78,11 @@ class StarTracker:
                     'average_stars': 0,
                     'completion_rate': 0
                 }
-            
-            # Calculate various stats using list comprehension
             stars_list = [a['stars'] for a in stack]
             time_list = [a['time'] for a in stack]
             
             best_stars = max(stars_list)
             best_time = min(time_list) if time_list else 0
-            
-            # Filter completed attempts (stars > 0)
             completed_attempts = [a for a in stack if a['stars'] > 0]
             
             return {
@@ -125,13 +102,8 @@ class StarTracker:
             'time': time,
             'timestamp': self.get_current_time()
         }
-        
-        # Enqueue (FIFO) - add to end
         self.recent_achievements.append(achievement)
-        
-        # Keep only last 5 achievements
         if len(self.recent_achievements) > 5:
-            # Dequeue from front (FIFO)
             self.recent_achievements.pop(0)
     
     def dequeue_recent_achievement(self):
@@ -184,14 +156,10 @@ class StarTracker:
         Level 1 always unlocked, rest unlock via completion queue.
         """
         unlocked = [1]  # Level 1 always available
-        
-        # Add all levels that have been completed (exist in completion status)
         completion_status = self.get_level_completion_status()
         for status in completion_status:
             if status['completed'] and status['level'] not in unlocked:
                 unlocked.append(status['level'])
-        
-        # Add queued levels
         for level in self.level_unlock_queue:
             if level not in unlocked:
                 unlocked.append(level)
@@ -234,7 +202,6 @@ class StarTracker:
     def save_data(self):
         """Save star data to JSON file"""
         try:
-            # Convert stacks to serializable format
             serializable_stacks = []
             for stack in self.star_stacks:
                 serializable_stacks.append(stack.copy())
@@ -258,23 +225,13 @@ class StarTracker:
             if os.path.exists(self.filename):
                 with open(self.filename, 'r') as f:
                     data = json.load(f)
-                
-                # Load stacks
                 self.star_stacks = []
                 for stack_data in data.get('star_stacks', []):
                     self.star_stacks.append(stack_data)
-                
-                # Load recent achievements
                 self.recent_achievements = data.get('recent_achievements', [])
-                
-                # Load level unlock queue
                 self.level_unlock_queue = data.get('level_unlock_queue', [])
-                
-                # Ensure we have the right number of stacks
                 while len(self.star_stacks) < self.total_levels:
                     self.star_stacks.append([])
-                
-                # Trim if we have too many
                 self.star_stacks = self.star_stacks[:self.total_levels]
                 
                 return True
@@ -311,13 +268,8 @@ class StarTracker:
         print("  - Recent achievements automatically enqueued (FIFO)")
         print("  - dequeue_recent_achievement(): Remove oldest recent achievement")
         print("=" * 35)
-
-
-# Example usage
 if __name__ == "__main__":
     tracker = StarTracker()
-    
-    # Demo stack operations (FILO)
     print("Demo: Stack Operations (FILO - Last In, First Out)")
     tracker.push_star_achievement(1, 3, 25.5)
     tracker.push_star_achievement(1, 2, 35.0)
@@ -328,14 +280,10 @@ if __name__ == "__main__":
     
     popped = tracker.pop_star_achievement(1)
     print(f"Popped from stack: {popped['stars']} stars")
-    
-    # Demo queue operations (FIFO)
     print("\nDemo: Queue Operations (FIFO - First In, First Out)")
     tracker.enqueue_recent_achievement(2, 3, 45.0)
     tracker.enqueue_recent_achievement(3, 1, 60.0)
     
     recent = tracker.get_recent_achievements()
     print(f"Recent achievements queue: {len(recent)} items")
-    
-    # Display all stats
     tracker.display_stats()
