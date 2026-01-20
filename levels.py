@@ -207,42 +207,36 @@ COLOR_NAMES = [
 ]
 
 def get_level(level_num):
-    """Get level data by number (1-10)"""
     if 1 <= level_num <= len(levels):
         return levels[level_num - 1]
     else:
         return None
 
 def get_tut_level(level_num):
-    """Get level data by number (1-10)"""
     if 1 <= level_num <= len(tutorial_levels):
         return tutorial_levels[level_num - 1]
     else:
         return None
 
 def get_total_levels():
-    """Get total number of levels"""
     return len(levels)
 
 def get_tut_total_levels():
     return len(tutorial_levels)
 
 def get_level_layout(level_num):
-    """Get just the tube layout for a level"""
     level = get_level(level_num)
     if level:
         return level["layout"]
     return None
 
 def get_level_star_times(level_num):
-    """Get star time thresholds for a level"""
     level = get_level(level_num)
     if level and "star_times" in level:
         return level["star_times"]
     return [60, 120, 180]  
 
 def print_level_info(level_num):
-    """Print level information (for debugging)"""
     level = get_level(level_num)
     if level:
         print(f"Level {level_num}: {level.get('name', 'Unnamed Level')}")

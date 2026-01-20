@@ -2,6 +2,7 @@ import pygame
 import sys
 import menu
 import game_functions as gf
+import levels
 
 def main():
     pygame.init()
@@ -31,12 +32,32 @@ def main():
                 current_screen = "game"
         
         elif current_screen == "game":          
-            stars_earned = gf.run_game(current_level)
-                  
+            stars_earned, final_level, game_time = gf.run_game(current_level)
+            
+            if game_time is None:
+                menu.tracker.load_data()
+                menu.create_level_buttons()
+                current_screen = "level_select"
+                continue
             if stars_earned > 0:
-                menu.update_level_stars(current_level, stars_earned)
-                  
-            current_screen = "level_select"
+                menu.update_level_stars(final_level, stars_earned)
+                total_levels = levels.get_total_levels()
+                end_result = gf.show_end_screen(final_level, stars_earned, game_time, total_levels)
+                
+                if end_result == "next" and final_level < total_levels:
+                    current_level = final_level + 1
+                    current_screen = "game"
+                elif end_result == "restart":
+                    current_level = final_level
+                    current_screen = "game"
+                else:
+                    menu.tracker.load_data()
+                    menu.create_level_buttons()
+                    current_screen = "level_select"
+            else:
+                menu.tracker.load_data()
+                menu.create_level_buttons()
+                current_screen = "level_select"
             
         elif current_screen == "options":           
             result = menu.run_options_screen()

@@ -11,7 +11,7 @@ class StarTracker:
         self.recent_achievements = []
         self.level_unlock_queue = []
         for _ in range(self.total_levels):
-            self.star_stacks.append([])  # Empty stack for each level
+            self.star_stacks.append([])
         
         self.load_data()
     
@@ -38,13 +38,13 @@ class StarTracker:
     def peek_star_achievement(self, level):
         if 1 <= level <= self.total_levels:
             if self.star_stacks[level-1]:
-                return self.star_stacks[level-1][-1]  # Last element
+                return self.star_stacks[level-1][-1]
         return None
     
     def get_best_stars(self, level):
         if 1 <= level <= self.total_levels:
             best_stars = 0
-            best_time = 0  # Change from float('inf') to 0
+            best_time = 0
             if not self.star_stacks[level-1]:
                 return best_stars, best_time
             first_achievement = self.star_stacks[level-1][0]
@@ -134,8 +134,17 @@ class StarTracker:
                 return next_level
         return None
     
+    def dequeue_next_level(self, current_level):
+        if 1 <= current_level < self.total_levels:
+            next_level = current_level + 1
+            if next_level in self.level_unlock_queue:
+                self.level_unlock_queue.remove(next_level)
+                self.save_data()
+                return next_level
+        return None
+    
     def get_unlocked_levels(self):
-        unlocked = [1]  # Level 1 always available
+        unlocked = [1]
         completion_status = self.get_level_completion_status()
         for status in completion_status:
             if status['completed'] and status['level'] not in unlocked:
@@ -198,11 +207,11 @@ class StarTracker:
             if os.path.exists(self.filename):
                 with open(self.filename, 'r') as f:
                     data = json.load(f)
-                self.star_stacks = []
-                for stack_data in data.get('star_stacks', []):
-                    self.star_stacks.append(stack_data)
+                
+                self.star_stacks = data.get('star_stacks', [[] for _ in range(self.total_levels)])
                 self.recent_achievements = data.get('recent_achievements', [])
                 self.level_unlock_queue = data.get('level_unlock_queue', [])
+                
                 while len(self.star_stacks) < self.total_levels:
                     self.star_stacks.append([])
                 self.star_stacks = self.star_stacks[:self.total_levels]
@@ -210,6 +219,10 @@ class StarTracker:
                 return True
         except Exception as e:
             print(f"Error loading star data: {e}")
+
+        self.star_stacks = [[] for _ in range(self.total_levels)]
+        self.recent_achievements = []
+        self.level_unlock_queue = []
         return False
     
     def get_current_time(self):
@@ -244,7 +257,7 @@ if __name__ == "__main__":
     print("Demo: Stack Operations (FILO - Last In, First Out)")
     tracker.push_star_achievement(1, 3, 25.5)
     tracker.push_star_achievement(1, 2, 35.0)
-    tracker.push_star_achievement(1, 3, 22.0)  # This will be on top
+    tracker.push_star_achievement(1, 3, 22.0)
     
     top = tracker.peek_star_achievement(1)
     print(f"Top of stack for level 1: {top['stars']} stars in {top['time']}s")

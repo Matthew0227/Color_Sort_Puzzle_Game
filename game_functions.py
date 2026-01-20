@@ -6,6 +6,32 @@ import math
 import levels
 import star_tracker
 pygame.init()
+
+class Button:
+    def __init__(self, x, y, width, height, text):
+        self.rect = pygame.Rect(x, y, width, height)
+        self.text = text
+        self.hovered = False
+        self.base_color = (50, 120, 180)
+
+    def draw(self, surface):
+        color = (80, 160, 220) if self.hovered else self.base_color
+        pygame.draw.rect(surface, color, self.rect, border_radius=8)
+        pygame.draw.rect(surface, (10, 10, 20), self.rect, 2, border_radius=8)
+        button_font = pygame.font.SysFont('arial', 24, bold=True)
+        text_surf = button_font.render(self.text, True, (240, 240, 240))
+        text_rect = text_surf.get_rect(center=self.rect.center)
+        surface.blit(text_surf, text_rect)
+
+    def check_hover(self, pos):
+        self.hovered = self.rect.collidepoint(pos)
+        return self.hovered
+
+    def is_clicked(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            if self.hovered:
+                return True
+        return False
 WIDTH = 1280
 HEIGHT = 720
 screen = pygame.display.set_mode([WIDTH, HEIGHT])
@@ -90,6 +116,67 @@ def draw_star_shape(surf, color, x, y, size):
         py = y + r * math.sin(angle)
         points.append((px, py))
     pygame.draw.polygon(surf, color, points)
+
+def show_end_screen(level_num, stars_earned, game_time, total_levels):
+    button_width = 100
+    button_height = 60
+    button_spacing = 100
+
+    back_button = Button(WIDTH // 2 - button_spacing - button_width // 2,
+                         340, button_width, button_height, "←")
+    restart_button = Button(WIDTH // 2 - button_width // 2,
+                           340, button_width, button_height, "Restart")
+    next_button = Button(WIDTH // 2 + button_spacing - button_width // 2,
+                        340, button_width, button_height, "→")
+
+    buttons = [back_button, restart_button, next_button]
+
+    next_button.base_color = (50, 120, 180) if level_num < total_levels else (100, 100, 100)
+
+    result = None
+    waiting = True
+
+    while waiting:
+        screen.fill((20, 20, 40))
+
+        title_font = pygame.font.SysFont('arial', 48, bold=True)
+        title_text = title_font.render("Level Complete!", True, (70, 200, 255))
+        screen.blit(title_text, (WIDTH // 2 - title_text.get_width() // 2, 60))
+
+        time_font = pygame.font.SysFont('arial', 40, bold=True)
+        time_text = time_font.render(f"Time: {game_time:.2f}s", True, (255, 255, 100))
+        screen.blit(time_text, (WIDTH // 2 - time_text.get_width() // 2, 140))
+
+        draw_stars(WIDTH // 2 - 60, 240, stars_earned)
+
+        mouse_pos = pygame.mouse.get_pos()
+        for button in buttons:
+            button.check_hover(mouse_pos)
+            button.draw(screen)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return "quit"
+
+            if back_button.is_clicked(event):
+                result = "back"
+                waiting = False
+            elif restart_button.is_clicked(event):
+                result = "restart"
+                waiting = False
+            elif next_button.is_clicked(event) and level_num < total_levels:
+                result = "next"
+                waiting = False
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    result = "back"
+                    waiting = False
+
+        pygame.display.flip()
+        timer.tick(fps)
+
+    return result
 
 def calculate_stars(time_taken, star_times):
     if time_taken < star_times[0]:
@@ -178,15 +265,14 @@ def get_tube_rect(tubes_num, index):
             return pygame.Rect(x, y, 65, 200)
         
 def get_centered_tube_rect(tubes_num, index):
-    """Smart tube positioning that works for both game and tutorial"""
-    if tubes_num <= 6:  # Tutorial typically has fewer tubes
+    if tubes_num <= 6:  
         tube_width = 65
         tube_spacing = 80
         total_width = tubes_num * tube_width + (tubes_num - 1) * tube_spacing
         start_x = (WIDTH - total_width) // 2
         
         x = start_x + index * (tube_width + tube_spacing)
-        y = 250  # Centered vertically
+        y = 250  
         
         return pygame.Rect(x, y, tube_width, 200)
     else:
@@ -220,7 +306,6 @@ def get_centered_tube_rect(tubes_num, index):
                 return pygame.Rect(x, y, 65, 200)
 
 def draw_tubes(tubes_num, tube_cols):
-    """Improved draw tubes that handles both game and tutorial layouts"""
     tube_boxes = []
 
     for i in range(tubes_num):
@@ -252,7 +337,6 @@ def draw_tubes(tubes_num, tube_cols):
     return tube_boxes
 
 def draw_moving_tube():
-    """Improved moving tube animation that works with both layouts"""
     if animation['state'] == AnimationState.IDLE:
         return
 
@@ -421,7 +505,7 @@ def run_game(level_num):
     global tube_colors, initial_colors, tubes, new_game, selected, tube_rects, select_rect, win, game_time, stars, current_star_times, animation
     
     try:
-        tracker = star_tracker_instance  # Use existing global
+        tracker = star_tracker_instance  
     except:
         tracker = star_tracker.StarTracker()
     current_level = level_num
@@ -451,6 +535,8 @@ def run_game(level_num):
     while run:
         screen.fill((20, 20, 40))
 
+        best_stars, best_time = star_tracker_instance.get_best_stars(current_level)
+
         if animation['state'] != AnimationState.IDLE:
             update_animation()
 
@@ -463,8 +549,8 @@ def run_game(level_num):
             new_game = False
             animation['state'] = AnimationState.IDLE
             win = False
-        else:
-            tube_rects = draw_tubes(tubes, tube_colors)
+        
+        tube_rects = draw_tubes(tubes, tube_colors)
 
         draw_moving_tube()
 
@@ -475,13 +561,13 @@ def run_game(level_num):
         if win and stars == 0:
             stars = calculate_stars(game_time, current_star_times)
             star_tracker_instance.push_star_achievement(current_level, stars, game_time)
-        
-        best_stars, best_time = star_tracker_instance.get_best_stars(current_level)
+            star_tracker_instance.unlock_next_level(current_level)
+            return (stars, current_level, game_time)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-                return stars
+                return (stars, current_level)
 
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_SPACE:
@@ -496,7 +582,7 @@ def run_game(level_num):
                     selected = False
                     select_rect = 100
                 elif event.key == pygame.K_ESCAPE:
-                    return stars
+                    return (stars, current_level, None)
                 elif event.key == pygame.K_s:
                     star_tracker_instance.display_stats()
 
@@ -516,21 +602,6 @@ def run_game(level_num):
                             selected = False
                             select_rect = 100
         
-        if win:
-            victory_text = font.render('You Won! Press ESC to return to menu!', True, 'white')
-            star_text = font.render(f'Stars earned: {stars}', True, 'yellow')
-            
-            box_width = max(victory_text.get_width(), star_text.get_width()) + 80
-            box_height = 120
-            box_x = WIDTH//2 - box_width//2
-            box_y = HEIGHT//2 - box_height//2 - 20
-            
-            pygame.draw.rect(screen, (30, 30, 70), (box_x, box_y, box_width, box_height))
-            pygame.draw.rect(screen, (0, 200, 255), (box_x, box_y, box_width, box_height), 4)
-            
-            screen.blit(victory_text, (WIDTH//2 - victory_text.get_width()//2, box_y + 30))
-            screen.blit(star_text, (WIDTH//2 - star_text.get_width()//2, box_y + 80))
-
         timer_text = font.render(f'Time: {game_time:.2f}s', True, 'yellow')
         screen.blit(timer_text, (WIDTH - 300, 20))
 
@@ -565,7 +636,7 @@ def run_how_to_play_screen():
     select_rect = 100
     win = False
     tutorial_complete = False
-    instruction_state = "select_first"  # Track tutorial instruction state
+    instruction_state = "select_first"  
 
     animation = {
         'state': AnimationState.IDLE,
@@ -596,7 +667,7 @@ def run_how_to_play_screen():
         win = check_victory(tube_colors)
 
         if win and not tutorial_complete:
-            pygame.time.delay(500)  # Small delay to show completed state
+            pygame.time.delay(500)  
             if tutorial_level < 3:
                 tutorial_level += 1
                 tubes, tube_colors = tut_generate_start(tutorial_level)
@@ -605,9 +676,9 @@ def run_how_to_play_screen():
                 win = False
                 selected = False
                 select_rect = 100
-                instruction_state = "select_first"  # Reset for next level
+                instruction_state = "select_first"  
             else:
-                tutorial_complete = True  # Player has completed all tutorial levels
+                tutorial_complete = True  
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -621,7 +692,7 @@ def run_how_to_play_screen():
                     animation['state'] = AnimationState.IDLE
                     selected = False
                     select_rect = 100
-                    instruction_state = "select_first"  # Reset tutorial instructions
+                    instruction_state = "select_first"  
                 elif event.key == pygame.K_ESCAPE:
                     return "main_menu"
                 elif event.key == pygame.K_s:
@@ -637,7 +708,7 @@ def run_how_to_play_screen():
                             selected = True
                             select_rect = item
                             if instruction_state == "select_first":
-                                instruction_state = "select_second"  # Update instruction state
+                                instruction_state = "select_second"  
                 else:
                     for item in range(len(tube_rects)):
                         if tube_rects[item].collidepoint(event.pos):
@@ -645,7 +716,7 @@ def run_how_to_play_screen():
                             selected = False
                             select_rect = 100
                             if instruction_state == "select_second":
-                                instruction_state = "completed_move"  # Player completed a move
+                                instruction_state = "completed_move"  
         esc_text = small_font.render('Press ESC to return to menu', True, (200, 200, 200))
         screen.blit(esc_text, (WIDTH - esc_text.get_width() - 20, 20))
         if tutorial_level == 1 and not win:

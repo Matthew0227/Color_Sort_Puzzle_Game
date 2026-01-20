@@ -330,6 +330,9 @@ def run_menu_screen():
         clock.tick(60)
 
 def run_level_select_screen():
+    global level_buttons
+    tracker.load_data()
+    create_level_buttons()
     clock = pygame.time.Clock()
     running = True
     
